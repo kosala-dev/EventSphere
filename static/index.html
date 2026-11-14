@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EventSphere</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Platform</p>
+          <h1>EventSphere</h1>
+        </div>
+        <div class="status-box" id="authStatus">Not signed in</div>
+      </header>
+
+      <main class="workspace-grid">
+        <section class="panel left-panel">
+          <div class="panel-header">
+            <h2>Authentication</h2>
+          </div>
+
+          <form id="registerForm" class="stacked-form">
+            <h3>Register</h3>
+            <input type="text" name="username" placeholder="Username" required />
+            <input type="email" name="email" placeholder="Email" required />
+            <input type="password" name="password" placeholder="Password" required />
+            <button type="submit" class="primary-button">Register</button>
+          </form>
+
+          <form id="loginForm" class="stacked-form">
+            <h3>Login</h3>
+            <input type="text" name="username" placeholder="Username" required />
+            <input type="password" name="password" placeholder="Password" required />
+            <button type="submit" class="primary-button">Login</button>
+          </form>
+
+          <button id="logoutButton" class="secondary-button full-width">Logout</button>
+        </section>
+
+        <section class="panel main-panel">
+          <div class="panel-header">
+            <h2>Event Browser</h2>
+            <button id="reloadEventsBtn" class="secondary-button small">Refresh</button>
+          </div>
+
+          <div class="search-box card">
+            <input id="searchInput" type="text" placeholder="Search by title, place, or category" />
+          </div>
+
+          <div id="eventList" class="event-list"></div>
+        </section>
+
+        <section class="panel right-panel">
+          <div class="panel-header">
+            <h2>Quick Actions</h2>
+          </div>
+
+          <form id="venueForm" class="stacked-form compact">
+            <h3>Add Venue</h3>
+            <input type="text" name="name" placeholder="Venue name" required />
+            <input type="text" name="location" placeholder="Location" required />
+            <input type="number" name="capacity" placeholder="Capacity" required />
+            <textarea name="description" rows="2" placeholder="Description"></textarea>
+            <input type="url" name="image_url" placeholder="Image URL" />
+            <input type="number" step="0.01" name="hourly_rate" placeholder="Hourly rate" required />
+            <label><input type="checkbox" name="is_open_for_hire" checked /> Open for hire</label>
+            <button type="submit" class="primary-button">Create Venue</button>
+          </form>
+
+          <form id="eventForm" class="stacked-form compact">
+            <h3>Create Event</h3>
+            <input type="text" name="title" placeholder="Event title" required />
+            <input type="text" name="category" placeholder="Category" required />
+            <input type="number" name="venue_id" placeholder="Venue ID" required />
+            <input type="datetime-local" name="start_time" required />
+            <input type="datetime-local" name="end_time" required />
+            <textarea name="description" rows="2" placeholder="Description"></textarea>
+            <select name="status">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <textarea name="ticket_categories" rows="3" placeholder='[{"name":"General","price":20,"quantity":50}]'></textarea>
+            <button type="submit" class="primary-button">Create Event</button>
+          </form>
+
+          <form id="bookingForm" class="stacked-form compact">
+            <h3>Book Ticket</h3>
+            <input type="number" name="event_id" placeholder="Event ID" required />
+            <input type="number" name="ticket_category_id" placeholder="Ticket Category ID" required />
+            <input type="number" name="quantity" placeholder="Quantity" min="1" required />
+            <button type="submit" class="primary-button">Book</button>
+          </form>
+
+          <form id="privateHireForm" class="stacked-form compact">
+            <h3>Private Hire</h3>
+            <input type="number" name="venue_id" placeholder="Venue ID" required />
+            <input type="datetime-local" name="start_time" required />
+            <input type="datetime-local" name="end_time" required />
+            <textarea name="purpose" rows="2" placeholder="Purpose"></textarea>
+            <input type="number" name="guest_count" placeholder="Guest count" required />
+            <button type="submit" class="primary-button">Request Hire</button>
+          </form>
+        </section>
+
+        <section class="panel full-width-panel">
+          <div class="panel-header">
+            <h2>Data Panels</h2>
+            <button id="refreshAllBtn" class="secondary-button small">Load all</button>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-card">
+              <h3>Venues</h3>
+              <div id="venuesPanel" class="list-panel"></div>
+            </div>
+
+            <div class="info-card">
+              <h3>Bookings</h3>
+              <div id="bookingsPanel" class="list-panel"></div>
+            </div>
+
+            <div class="info-card">
+              <h3>Dashboard</h3>
+              <div id="dashboardPanel" class="list-panel"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+  </body>
+</html>
