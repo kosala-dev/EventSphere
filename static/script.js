@@ -391,6 +391,25 @@ function renderDashboard(data) {
   const totalSold = events.reduce((sum, event) => sum + Number(event.tickets_sold || 0), 0);
   const totalRevenue = events.reduce((sum, event) => sum + Number(event.simulated_revenue || 0), 0);
   const totalCheckIns = events.reduce((sum, event) => sum + Number(event.check_ins || 0), 0);
+  const salesEvents = [...events].sort((a, b) => Number(b.simulated_revenue || 0) - Number(a.simulated_revenue || 0));
+  const maxRevenue = Math.max(0, ...salesEvents.map((event) => Number(event.simulated_revenue) || 0));
+  const salesChart = salesEvents.length
+    ? `<div class="sales-chart-list">${salesEvents.map((event) => {
+      const revenue = Math.max(0, Number(event.simulated_revenue) || 0);
+      const barWidth = maxRevenue > 0 ? Math.min(100, (revenue / maxRevenue) * 100) : 0;
+      return `<div class="sales-chart-row"><div class="sales-chart-label"><span>${escapeHTML(event.title)}</span><strong>${revenue.toFixed(2)}</strong></div><div class="sales-chart-track" aria-hidden="true"><span style="width:${barWidth}%"></span></div></div>`;
+    }).join('')}</div>`
+    : '<div class="empty-state">No event sales to chart yet.</div>';
+  const checkIns = data?.check_ins_over_time || [];
+  const maxCheckIns = Math.max(1, ...checkIns.map((entry) => Number(entry.check_ins) || 0));
+  const chartBars = checkIns.map((entry, index) => {
+    const count = Math.max(0, Number(entry.check_ins) || 0);
+    const x = 26 + index * 96;
+    const height = count > 0 ? (count / maxCheckIns) * 132 : 0;
+    const y = 178 - height;
+    const dateLabel = String(entry.date || '').slice(5).replace('-', '/');
+    return `<g><title>${escapeHTML(entry.date)}: ${count} check-ins</title><rect class="checkin-chart-bar" x="${x}" y="${y}" width="46" height="${height}" rx="5"></rect><text class="checkin-chart-value" x="${x + 23}" y="${Math.max(28, y - 8)}" text-anchor="middle">${count}</text><text class="checkin-chart-date" x="${x + 23}" y="202" text-anchor="middle">${escapeHTML(dateLabel)}</text></g>`;
+  }).join('');
   const metrics = [
     ['Events', data?.total_events || 0],
     ['Tickets sold', totalSold],
@@ -398,6 +417,18 @@ function renderDashboard(data) {
     ['Check-ins', totalCheckIns],
   ];
   dashboardPanel.innerHTML = metrics.map(([label, value]) => `<div class="metric-card"><span>${label}</span><strong>${escapeHTML(value)}</strong></div>`).join('') +
+    `<div class="dashboard-charts full-field">
+      <article class="surface-card chart-card">
+        <div class="card-heading"><div><p class="eyebrow">Sales</p><h3>Revenue by event</h3></div></div>
+        ${salesChart}
+      </article>
+      <article class="surface-card chart-card">
+        <div class="card-heading"><div><p class="eyebrow">Attendance</p><h3>Check-ins over time</h3></div></div>
+        ${checkIns.length
+          ? `<svg class="checkin-chart-svg" viewBox="0 0 650 220" role="img" aria-label="Ticket check-ins per day for the last seven days"><line class="checkin-chart-axis" x1="10" y1="178" x2="640" y2="178"></line>${chartBars}</svg><p class="chart-caption">Daily check-ins · last 7 days</p>`
+          : '<div class="empty-state">No check-ins recorded yet.</div>'}
+      </article>
+    </div>` +
     `<div class="surface-card full-field"><div class="card-heading"><div><p class="eyebrow">Live overview</p><h3>Event performance</h3></div></div><div class="stack-list">${
       events.length ? events.map((event) => `<div class="list-row"><div><strong>${escapeHTML(event.title)}</strong><small>${escapeHTML(event.status)} · ${escapeHTML(event.tickets_sold)} sold · ${escapeHTML(event.check_ins)} checked in</small></div><strong>${escapeHTML(Number(event.simulated_revenue || 0).toFixed(2))}</strong></div>`).join('') : '<div class="empty-state">No events to report yet.</div>'
     }</div></div>`;

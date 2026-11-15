@@ -253,6 +253,21 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .metric-card span, .metric-card strong { display: block; }
 .metric-card span { color: var(--muted); font-size: calc(10px + 2px); }
 .metric-card strong { margin-top: 8px; font-size: calc(23px + 2px); letter-spacing: -.06em; }
+.dashboard-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.chart-card { min-width: 0; overflow: hidden; }
+.sales-chart-list { display: grid; gap: 13px; }
+.sales-chart-row { min-width: 0; }
+.sales-chart-label { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; font-size: calc(10px + 2px); }
+.sales-chart-label span { overflow: hidden; color: var(--ink); text-overflow: ellipsis; white-space: nowrap; }
+.sales-chart-label strong { flex: 0 0 auto; color: #536057; font-size: calc(10px + 2px); }
+.sales-chart-track { height: 9px; overflow: hidden; border-radius: 99px; background: #edf2eb; }
+.sales-chart-track span { display: block; height: 100%; border-radius: inherit; background: var(--green); }
+.checkin-chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.checkin-chart-axis { stroke: var(--line); stroke-width: 1.5; }
+.checkin-chart-bar { fill: #82a985; }
+.checkin-chart-value { fill: var(--ink); font-size: 13px; font-weight: 700; }
+.checkin-chart-date { fill: var(--muted); font-size: 12px; }
+.chart-caption { margin: 4px 0 0; color: var(--muted); font-size: calc(10px + 2px); text-align: center; }
 
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
 .field { display: grid; min-width: 0; gap: 7px; color: #59665c; font-size: calc(10px + 2px); font-weight: 650; }
@@ -337,6 +352,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .event-grid { grid-template-columns: 1fr; }
   .event-art { height: 165px; }
   .workspace-grid, .admin-grid { grid-template-columns: 1fr; }
+  .dashboard-charts { grid-template-columns: 1fr; }
   .ticket-grid { grid-template-columns: 1fr; }
   .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .surface-card { padding: 18px; }

@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func
 from sqlalchemy.orm import Session
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 from database import get_db
 from dependencies import require_role
@@ -52,9 +54,35 @@ def get_organiser_metrics(
             "attendance_rate": f"{round((check_ins_count / tickets_sold * 100), 2)}%" if tickets_sold > 0 else "0%"
         })
 
+    today = datetime.now(timezone.utc).date()
+    start_day = today - timedelta(days=6)
+    start_at = datetime.combine(start_day, datetime.min.time())
+    check_ins_by_day = {
+        start_day + timedelta(days=offset): 0
+        for offset in range(7)
+    }
+    daily_check_ins = db.query(
+        func.date(TicketModel.checked_in_at),
+        func.count(TicketModel.id),
+    ).join(
+        BookingModel, TicketModel.booking_id == BookingModel.id
+    ).filter(
+        TicketModel.is_checked_in.is_(True),
+        TicketModel.checked_in_at >= start_at,
+        BookingModel.status == "active",
+    ).group_by(
+        func.date(TicketModel.checked_in_at)
+    ).all()
+    for day, count in daily_check_ins:
+        check_ins_by_day[datetime.fromisoformat(str(day)).date()] = count
+
     return {
         "total_events": len(events),
-        "events_breakdown": dashboard_data
+        "events_breakdown": dashboard_data,
+        "check_ins_over_time": [
+            {"date": day.isoformat(), "check_ins": count}
+            for day, count in sorted(check_ins_by_day.items())
+        ],
     }
 
 
