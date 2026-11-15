@@ -11,6 +11,33 @@ from agents.message_bus import MessageBus
 
 router = APIRouter(prefix="/private-hire", tags=["Private Venue Hire"])
 
+
+@router.get("/")
+def list_private_hire_requests(
+    db: Session = Depends(get_db),
+    admin_user: UserInDB = Depends(require_role(UserRole.admin))
+):
+    requests = db.query(PrivateHireRequestModel).order_by(
+        PrivateHireRequestModel.start_time.asc()
+    ).all()
+    return [
+        {
+            "id": request.id,
+            "username": request.username,
+            "venue_id": request.venue_id,
+            "venue_name": request.venue.name if request.venue else "Unknown venue",
+            "start_time": request.start_time,
+            "end_time": request.end_time,
+            "purpose": request.purpose,
+            "guest_count": request.guest_count,
+            "total_price": request.total_price,
+            "status": request.status,
+            "admin_notes": request.admin_notes,
+        }
+        for request in requests
+    ]
+
+
 class PrivateHireRequestCreate(BaseModel):
     venue_id: int
     start_time: datetime

@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from pydantic import BaseModel
-from typing import List, Optional
+from pydantic import BaseModel, Field
+from typing import Optional
 from datetime import datetime
 import uuid
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from database import get_db
 from dependencies import get_current_user
 from models import UserInDB, UserRole
@@ -16,7 +16,29 @@ router = APIRouter(prefix="", tags=["Browsing and Booking"])
 class BookingRequest(BaseModel):
     event_id: int
     ticket_category_id: int
-    quantity: int
+    quantity: int = Field(gt=0)
+
+
+def serialize_booking(booking: BookingModel) -> dict:
+    return {
+        "id": booking.id,
+        "event_id": booking.event_id,
+        "event_title": booking.event.title if booking.event else None,
+        "ticket_category_id": booking.ticket_category_id,
+        "ticket_category_name": booking.ticket_category.name if booking.ticket_category else None,
+        "quantity": booking.quantity,
+        "total_price": booking.total_price,
+        "status": booking.status,
+        "booked_at": booking.booked_at,
+        "tickets": [
+            {
+                "id": ticket.id,
+                "is_checked_in": ticket.is_checked_in,
+                "checked_in_at": ticket.checked_in_at,
+            }
+            for ticket in booking.tickets
+        ],
+    }
 
 
 # search events
@@ -46,6 +68,7 @@ def search_events(
             "title": event.title,
             "category": event.category,
             "venue_id": event.venue_id,
+            "venue_name": event.venue.name if event.venue else None,
             "start_time": event.start_time,
             "end_time": event.end_time,
             "description": event.description,
@@ -82,11 +105,12 @@ def create_booking(
     current_user: UserInDB = Depends(get_current_user)
 ):
     category = db.query(TicketCategoryModel).filter(
-        TicketCategoryModel.id == booking_req.ticket_category_id
+        TicketCategoryModel.id == booking_req.ticket_category_id,
+        TicketCategoryModel.event_id == booking_req.event_id,
     ).with_for_update().first()
     
     if not category:
-        raise HTTPException(status_code=404, detail="Ticket category not found.")
+        raise HTTPException(status_code=404, detail="Ticket category not found for this event.")
         
     # verify event is published
     event = db.query(EventModel).filter(
@@ -136,8 +160,10 @@ def create_booking(
         ))
         
     db.commit()
-    db.refresh(new_booking)
-    return new_booking
+    created_booking = db.query(BookingModel).options(
+        selectinload(BookingModel.tickets)
+    ).filter(BookingModel.id == new_booking.id).one()
+    return serialize_booking(created_booking)
 
 
 # booking history
@@ -146,8 +172,10 @@ def get_booking_history(
     db: Session = Depends(get_db),
     current_user: UserInDB = Depends(get_current_user)
 ):
-    user_bookings = db.query(BookingModel).filter(BookingModel.username == current_user.username).all()
-    return user_bookings
+    user_bookings = db.query(BookingModel).options(
+        selectinload(BookingModel.tickets)
+    ).filter(BookingModel.username == current_user.username).all()
+    return [serialize_booking(booking) for booking in user_bookings]
 
 
 # cancl booking
@@ -166,6 +194,12 @@ def cancel_booking(
     
     if booking.status == "cancelled":
         raise HTTPException(status_code=400, detail="Booking is already cancelled.")
+
+    if any(ticket.is_checked_in for ticket in booking.tickets):
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot cancel a booking after a ticket has been scanned.",
+        )
     
     event = db.query(EventModel).filter(EventModel.id == booking.event_id).first()
     refund_amount = 0.0

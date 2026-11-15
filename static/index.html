@@ -3,135 +3,220 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EventSphere</title>
+    <meta name="theme-color" content="#ffffff" />
+    <title>EventSphere — Find your next moment</title>
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
-    <div class="page-shell">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">Platform</p>
-          <h1>EventSphere</h1>
+    <header class="site-header">
+      <a class="brand" href="#browse" aria-label="EventSphere home">
+        <span class="brand-mark">E</span>
+        <span>Event<span class="brand-light">Sphere</span></span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#browse">Discover</a>
+        <a class="role-nav" id="workspaceNav" href="#workspace" hidden>My workspace</a>
+        <a class="role-nav" id="adminNav" href="#workspace" hidden>Organiser console</a>
+        <a class="role-nav" id="staffNav" href="#workspace" hidden>Gate check-in</a>
+      </nav>
+      <div class="header-actions">
+        <span id="authStatus" class="auth-status">Guest</span>
+        <a class="button button-quiet" id="loginLink" href="#login">Log in</a>
+        <a class="button button-primary" id="registerLink" href="#register">Get started</a>
+        <button class="button button-quiet" id="logoutButton" type="button" hidden>Log out</button>
+      </div>
+    </header>
+
+    <main>
+      <div id="publicView">
+        <section class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">Good things happen together</p>
+            <h1>Find your next<br /><span>great moment.</span></h1>
+            <p class="hero-description">
+              Discover live events, find your people, and make plans worth looking forward to.
+            </p>
+            <a class="button button-primary button-large" href="#event-browser">Explore events <span aria-hidden="true">→</span></a>
+            <div class="hero-proof"><span class="proof-dot"></span> Your city's next story starts here</div>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="art-orbit orbit-one"></div>
+            <div class="art-orbit orbit-two"></div>
+            <div class="art-card art-card-main"><span class="art-spark">✦</span><span class="art-word">SHOW<br />UP.</span><span class="art-caption">For the moments<br />that move you.</span></div>
+            <div class="art-card art-card-small"><span class="art-note">♫</span><span>MAKE IT<br />A NIGHT.</span></div>
+            <div class="art-sticker">LIVE<br />A LITTLE</div>
+          </div>
+        </section>
+
+        <section class="content-section event-section" id="event-browser">
+          <div class="section-heading">
+            <div><p class="eyebrow">Make a plan</p><h2>Events worth stepping out for</h2></div>
+            <button id="reloadEventsBtn" class="button button-quiet" type="button">Refresh events</button>
+          </div>
+          <label class="search-field">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input id="searchInput" type="search" placeholder="Search events, artists, or categories" aria-label="Search events" />
+          </label>
+          <div id="eventList" class="event-grid" aria-live="polite"></div>
+        </section>
+      </div>
+
+      <section id="workspace" class="workspace-section" hidden>
+        <div class="section-heading workspace-heading">
+          <div><p class="eyebrow">Your EventSphere</p><h2 id="workspaceTitle">Your workspace</h2></div>
+          <button id="refreshAllBtn" class="button button-quiet" type="button">Refresh data</button>
         </div>
-        <div class="status-box" id="authStatus">Not signed in</div>
-      </header>
 
-      <main class="workspace-grid">
-        <section class="panel left-panel">
-          <div class="panel-header">
-            <h2>Authentication</h2>
+        <section id="attendeeWorkspace" class="role-workspace" hidden>
+          <div class="workspace-grid">
+            <article class="surface-card">
+              <div class="card-heading"><div><p class="eyebrow">Your plans</p><h3>My bookings</h3></div></div>
+              <p id="bookingSuccess" class="inline-feedback booking-success" aria-live="polite" hidden></p>
+              <div id="bookingsPanel" class="stack-list"></div>
+            </article>
+            <article class="surface-card">
+              <div class="card-heading"><div><p class="eyebrow">Make it yours</p><h3>Request a private venue</h3></div></div>
+              <form id="privateHireForm" class="form-grid">
+                <label class="field full-field">Venue<select name="venue_id" id="hireVenueSelect" required><option value="">Choose a venue</option></select></label>
+                <label class="field">Start<input type="datetime-local" name="start_time" required /></label>
+                <label class="field">End<input type="datetime-local" name="end_time" required /></label>
+                <label class="field">Guest count<input type="number" name="guest_count" min="1" required placeholder="e.g. 80" /></label>
+                <label class="field">What are you planning?<textarea name="purpose" rows="3" required placeholder="Tell us a little about your event"></textarea></label>
+                <button class="button button-primary full-field" type="submit">Request venue hire</button>
+              </form>
+              <p id="hireFeedback" class="inline-feedback" aria-live="polite"></p>
+            </article>
           </div>
-
-          <form id="registerForm" class="stacked-form">
-            <h3>Register</h3>
-            <input type="text" name="username" placeholder="Username" required />
-            <input type="email" name="email" placeholder="Email" required />
-            <input type="password" name="password" placeholder="Password" required />
-            <button type="submit" class="primary-button">Register</button>
-          </form>
-
-          <form id="loginForm" class="stacked-form">
-            <h3>Login</h3>
-            <input type="text" name="username" placeholder="Username" required />
-            <input type="password" name="password" placeholder="Password" required />
-            <button type="submit" class="primary-button">Login</button>
-          </form>
-
-          <button id="logoutButton" class="secondary-button full-width">Logout</button>
         </section>
 
-        <section class="panel main-panel">
-          <div class="panel-header">
-            <h2>Event Browser</h2>
-            <button id="reloadEventsBtn" class="secondary-button small">Refresh</button>
-          </div>
-
-          <div class="search-box card">
-            <input id="searchInput" type="text" placeholder="Search by title, place, or category" />
-          </div>
-
-          <div id="eventList" class="event-list"></div>
-        </section>
-
-        <section class="panel right-panel">
-          <div class="panel-header">
-            <h2>Quick Actions</h2>
-          </div>
-
-          <form id="venueForm" class="stacked-form compact">
-            <h3>Add Venue</h3>
-            <input type="text" name="name" placeholder="Venue name" required />
-            <input type="text" name="location" placeholder="Location" required />
-            <input type="number" name="capacity" placeholder="Capacity" required />
-            <textarea name="description" rows="2" placeholder="Description"></textarea>
-            <input type="url" name="image_url" placeholder="Image URL" />
-            <input type="number" step="0.01" name="hourly_rate" placeholder="Hourly rate" required />
-            <label><input type="checkbox" name="is_open_for_hire" checked /> Open for hire</label>
-            <button type="submit" class="primary-button">Create Venue</button>
-          </form>
-
-          <form id="eventForm" class="stacked-form compact">
-            <h3>Create Event</h3>
-            <input type="text" name="title" placeholder="Event title" required />
-            <input type="text" name="category" placeholder="Category" required />
-            <input type="number" name="venue_id" placeholder="Venue ID" required />
-            <input type="datetime-local" name="start_time" required />
-            <input type="datetime-local" name="end_time" required />
-            <textarea name="description" rows="2" placeholder="Description"></textarea>
-            <select name="status">
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-            <textarea name="ticket_categories" rows="3" placeholder='[{"name":"General","price":20,"quantity":50}]'></textarea>
-            <button type="submit" class="primary-button">Create Event</button>
-          </form>
-
-          <form id="bookingForm" class="stacked-form compact">
-            <h3>Book Ticket</h3>
-            <input type="number" name="event_id" placeholder="Event ID" required />
-            <input type="number" name="ticket_category_id" placeholder="Ticket Category ID" required />
-            <input type="number" name="quantity" placeholder="Quantity" min="1" required />
-            <button type="submit" class="primary-button">Book</button>
-          </form>
-
-          <form id="privateHireForm" class="stacked-form compact">
-            <h3>Private Hire</h3>
-            <input type="number" name="venue_id" placeholder="Venue ID" required />
-            <input type="datetime-local" name="start_time" required />
-            <input type="datetime-local" name="end_time" required />
-            <textarea name="purpose" rows="2" placeholder="Purpose"></textarea>
-            <input type="number" name="guest_count" placeholder="Guest count" required />
-            <button type="submit" class="primary-button">Request Hire</button>
-          </form>
-        </section>
-
-        <section class="panel full-width-panel">
-          <div class="panel-header">
-            <h2>Data Panels</h2>
-            <button id="refreshAllBtn" class="secondary-button small">Load all</button>
-          </div>
-
-          <div class="info-grid">
-            <div class="info-card">
-              <h3>Venues</h3>
-              <div id="venuesPanel" class="list-panel"></div>
+        <section id="staffWorkspace" class="role-workspace" hidden>
+          <article class="surface-card scanner-card">
+            <div class="card-heading"><div><p class="eyebrow">Fast, friendly entry</p><h3>Ticket check-in</h3></div><span class="status-pill">Gate staff</span></div>
+            <p class="muted-copy">Enter the ticket code and event ID to validate a guest's ticket. Each ticket can only be checked in once.</p>
+            <div class="scanner-camera-controls">
+              <button id="startQrScanner" class="button button-quiet" type="button">Scan QR with camera</button>
+              <button id="stopQrScanner" class="button button-quiet" type="button" hidden>Stop camera</button>
             </div>
+            <video id="scannerVideo" class="scanner-video" autoplay playsinline hidden></video>
+            <p id="cameraFeedback" class="inline-feedback" aria-live="polite"></p>
+            <form id="scannerForm" class="scanner-form">
+              <label class="field">Ticket code<input type="text" name="ticket_code" autocomplete="off" required placeholder="Scan or enter ticket code" /></label>
+              <label class="field">Event ID<input type="number" name="expected_event_id" min="1" required placeholder="Event ID" /></label>
+              <button class="button button-primary" type="submit">Verify &amp; check in</button>
+            </form>
+            <div id="scannerFeedback" class="scanner-feedback" aria-live="polite"></div>
+          </article>
+        </section>
 
-            <div class="info-card">
-              <h3>Bookings</h3>
-              <div id="bookingsPanel" class="list-panel"></div>
-            </div>
+        <section id="adminWorkspace" class="role-workspace" hidden>
+          <div class="metric-grid" id="dashboardPanel"></div>
+          <div class="workspace-grid admin-grid">
+            <article class="surface-card">
+              <div class="card-heading"><div><p class="eyebrow">Build the lineup</p><h3>Create an event</h3></div></div>
+              <form id="eventForm" class="form-grid">
+                <label class="field full-field">Event name<input name="title" required placeholder="e.g. Summer sounds live" /></label>
+                <label class="field">Category<input name="category" required placeholder="Music, arts, food..." /></label>
+                <label class="field">Venue<select name="venue_id" id="eventVenueSelect" required><option value="">Choose a venue</option></select></label>
+                <label class="field">Starts<input type="datetime-local" name="start_time" required /></label>
+                <label class="field">Ends<input type="datetime-local" name="end_time" required /></label>
+                <label class="field full-field">About the event<textarea name="description" rows="3" placeholder="What should guests know?"></textarea></label>
+                <div class="field full-field ticket-tier-field">
+                  <div class="tier-heading"><span class="field-title">Ticket categories</span><button id="addTicketTier" class="text-button" type="button">+ Add category</button></div>
+                  <div id="ticketTiers" class="ticket-tiers">
+                    <div class="ticket-tier">
+                      <input name="tier_name" aria-label="Ticket category name" required placeholder="Category e.g. General" />
+                      <input name="tier_price" aria-label="Ticket price" type="number" min="0" step="0.01" required placeholder="Price" />
+                      <input name="tier_quantity" aria-label="Ticket quantity" type="number" min="1" required placeholder="Quantity" />
+                    </div>
+                  </div>
+                </div>
+                <label class="field">Visibility<select name="status"><option value="published">Published</option><option value="draft">Draft</option></select></label>
+                <button class="button button-primary" type="submit">Create event</button>
+              </form>
+            </article>
 
-            <div class="info-card">
-              <h3>Dashboard</h3>
-              <div id="dashboardPanel" class="list-panel"></div>
-            </div>
+            <article class="surface-card">
+              <div class="card-heading"><div><p class="eyebrow">Find a home for it</p><h3>Add a venue</h3></div></div>
+              <form id="venueForm" class="form-grid">
+                <label class="field full-field">Venue name<input name="name" required placeholder="Venue name" /></label>
+                <label class="field full-field">Location<input name="location" required placeholder="City, district, or address" /></label>
+                <label class="field">Capacity<input name="capacity" type="number" min="1" required placeholder="Guests" /></label>
+                <label class="field">Hourly rate<input name="hourly_rate" type="number" min="0" step="0.01" required placeholder="Rate" /></label>
+                <label class="field full-field">Description<textarea name="description" rows="3" placeholder="Tell organisers about the space"></textarea></label>
+                <label class="field full-field">Image URL<input name="image_url" type="url" placeholder="https://" /></label>
+                <label class="check-field full-field"><input type="checkbox" name="is_open_for_hire" checked /> Available for private hire</label>
+                <button class="button button-primary full-field" type="submit">Add venue</button>
+              </form>
+            </article>
+
+            <article class="surface-card">
+              <div class="card-heading"><div><p class="eyebrow">Manage access</p><h3>Create staff or organiser account</h3></div></div>
+              <form id="managedAccountForm" class="form-grid">
+                <label class="field full-field">Username<input name="username" minlength="3" maxlength="64" required placeholder="Username" /></label>
+                <label class="field full-field">Email<input name="email" type="email" required placeholder="name@example.com" /></label>
+                <label class="field full-field">Temporary password<input name="password" type="password" minlength="12" maxlength="72" autocomplete="new-password" required placeholder="At least 12 characters" /></label>
+                <label class="field full-field">Role<select name="role" required><option value="staff">Gate staff</option><option value="admin">Organiser / admin</option></select></label>
+                <button class="button button-primary full-field" type="submit">Create role account</button>
+              </form>
+              <p id="managedAccountFeedback" class="inline-feedback" aria-live="polite"></p>
+            </article>
+
+            <article class="surface-card">
+              <div class="card-heading"><div><p class="eyebrow">Review requests</p><h3>Private venue hire</h3></div></div>
+              <div id="hireRequestsPanel" class="stack-list"></div>
+            </article>
           </div>
         </section>
-      </main>
-    </div>
+      </section>
 
+      <dialog id="bookingConfirmDialog" class="booking-dialog" aria-labelledby="bookingDialogTitle">
+        <p class="eyebrow">One last step</p>
+        <h2 id="bookingDialogTitle">Confirm your ticket</h2>
+        <p id="bookingSummary" class="muted-copy"></p>
+        <p id="bookingDialogFeedback" class="inline-feedback" aria-live="polite"></p>
+        <div class="dialog-actions">
+          <button id="cancelBookingConfirm" class="button button-quiet" type="button">Not now</button>
+          <button id="confirmBookingBtn" class="button button-primary" type="button">Confirm booking</button>
+        </div>
+      </dialog>
+
+      <section id="authView" class="auth-view" hidden>
+        <div class="auth-card">
+          <a class="auth-back" href="#browse">← Back to events</a>
+          <div id="loginPage" class="auth-page" hidden>
+            <p class="eyebrow">Welcome back</p><h1>Good to see you.</h1>
+            <p class="muted-copy">Log in to continue to your EventSphere workspace.</p>
+            <form id="loginForm" class="auth-form">
+              <label class="field">Username<input type="text" name="username" autocomplete="username" required /></label>
+              <label class="field">Password<input type="password" name="password" autocomplete="current-password" required /></label>
+              <button class="button button-primary" type="submit">Log in</button>
+            </form>
+            <p class="auth-switch">New to EventSphere? <a href="#register">Create an attendee account</a></p>
+            <p class="account-note">Gate staff and organiser accounts are assigned by the platform administrator.</p>
+          </div>
+          <div id="registerPage" class="auth-page" hidden>
+            <p class="eyebrow">Start with a good plan</p><h1>Join the good stuff.</h1>
+            <p class="muted-copy">Create an attendee account to book events and request private venue hire.</p>
+            <form id="registerForm" class="auth-form">
+              <label class="field">Username<input type="text" name="username" autocomplete="username" required /></label>
+              <label class="field">Email<input type="email" name="email" autocomplete="email" required /></label>
+              <label class="field">Password<input type="password" name="password" autocomplete="new-password" minlength="8" required /></label>
+              <button class="button button-primary" type="submit">Create account</button>
+            </form>
+            <p class="auth-switch">Already have an account? <a href="#login">Log in</a></p>
+            <p class="account-note">Staff and organiser access is managed separately to keep role permissions secure.</p>
+          </div>
+          <p id="authFeedback" class="inline-feedback" aria-live="polite"></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="brand footer-brand" href="#browse"><span class="brand-mark">E</span><span>Event<span class="brand-light">Sphere</span></span></a>
+      <p>Make room for moments that matter.</p>
+      <span>© <span id="year"></span> EventSphere</span>
+    </footer>
+    <script src="/static/vendor/jsQR.js"></script>
     <script src="/static/script.js"></script>
   </body>
 </html>

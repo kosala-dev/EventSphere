@@ -1,15 +1,11 @@
-import os
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
 import jwt
 
+from config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
+
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# Use os.getenv with appropriate defaults for configuration
-SECRET_KEY = os.getenv("SECRET_KEY", "your-super-secret-development-key-change-in-production")
-ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
