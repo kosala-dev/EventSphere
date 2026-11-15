@@ -4,6 +4,7 @@ sqlalchemy>=2,<3
 psycopg[binary]>=3.2,<4
 python-dotenv>=1,<2
 passlib[bcrypt]>=1.7.4,<2
+bcrypt>=4.0.1,<5
 PyJWT>=2.8,<3
 qrcode[pil]>=7.4,<9
 python-multipart>=0.0.9
