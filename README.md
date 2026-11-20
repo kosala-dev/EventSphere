@@ -22,6 +22,10 @@ Please don't delete the demo events. The data may get reset from time to time.
 
 <img width="1888" height="904" alt="home" src="https://github.com/user-attachments/assets/878fe165-fecc-4d52-952f-e6be8ccb37c9" />
 
+<img width="1881" height="904" alt="ticket" src="https://github.com/user-attachments/assets/ff681059-b892-4c06-8d38-167e3e66a2ff" />
+
+<img width="1894" height="910" alt="staff" src="https://github.com/user-attachments/assets/7f8e9268-4803-462d-ab1c-292d0e1e33f0" />
+
 
 ## What it does
 
