@@ -1,103 +1,142 @@
 # EventSphere
 
-This project is created as a role-based event & venue booking digital platform built with FastAPI and a browser based frontend
+A Agent Based web app for booking events and venues, with QR code tickets. I built this project using FastAPI as a project for my IT degree at the University of Vavuniya.
 
-## Features
+People can browse events and book tickets. Organisers create venues and events, and gate staff scan the QR tickets at the entrance.
 
-- Roled based authentication(Attendee, Admin & the Staff)
-- Event & Venue management once at a particular time
-- Ticket booking with availability checks, QR tickets, and booking history.
-- QR ticket scanning and check-in for gate staff.
-- Live database server
+## Live demo
 
-## Requirements
+**Link:** https://eventsphere-2y9h.onrender.com/
 
-- Python 3.10 or later.
-- pip.
-- SQLite for the default local setup, or PostgreSQL if you configure a PostgreSQL database.
+The free Render plan sleeps when nobody uses it, so the first load can take about 30 seconds.
 
-## Run locally
+**Demo admin account** (made only for this demo, no real data):
 
-From the repository root, create and activate a virtual environment, then install the dependencies.
+| Username | Password |
+| -------- | -------- |
+| agentadmin | agentadmin123 |
 
-### Windows PowerShell
+Please don't delete the demo events. The data may get reset from time to time.
 
-```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements.txt
+## Screenshots
+
+img src="https://drive.google.com/file/d/1SA8JRRpKR2YWWjZ_n9UZx_vjKL7YhTKX/view?usp=drive_link"
+
+## What it does
+
+- Three kinds of users: attendees, admins (organisers) and gate staff, each with their own access.
+- Admins create venues and events, and an event can't be booked into a venue at a time that is already taken.
+- Attendees register, book tickets and see their booking history.
+- Booking checks how many tickets are left, so an event can't be oversold.
+- Every booking gets a QR ticket.
+- Gate staff scan the QR ticket and the ticket is marked as checked in.
+
+## Built with
+
+- Python and FastAPI
+- SQLite for local use, PostgreSQL
+- A browser-based frontend served from the `static` folder
+- Deployed on Render
+
+## Run it on your machine
+
+You need Python 3.10 or newer.
+
+1. Clone the repo and open the folder.
+
+2. Create a virtual environment and install the packages.
+
+   Windows (PowerShell):
+
+   ```
+   py -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   pip install -r requirements.txt
+   ```
+
+   macOS or Linux:
+
+   ```
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+3. Make a `.env` file in the project folder with a secret key:
+
+   ```
+   SECRET_KEY=your_long_random_key_here
+   ```
+
+   You can generate one with:
+
+   ```
+   python -c "import secrets; print(secrets.token_urlsafe(48))"
+   ```
+
+4. Start the app:
+
+   ```
+   python -m uvicorn main:app --reload
+   ```
+
+5. Open http://127.0.0.1:8000/ for the app, or http://127.0.0.1:8000/docs for the API docs.
+
+On the first run the tables are created automatically. If you don't set a database URL, it uses a local SQLite file called `eventsphere.db`.
+
+## Settings (.env)
+
+| Variable | Required | What it does |
+| -------- | -------- | ------------ |
+| `SECRET_KEY` | Yes | Used to sign login tokens. At least 32 characters. |
+| `DATABASE_URL` | No | Database to use. Defaults to a local SQLite file. |
+| `SQLALCHEMY_DATABASE_URL` | No | Same as above. If both are set, this one wins. |
+| `ALGORITHM` | No | Token signing algorithm. |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | No | How long a login lasts. |
+
+## Making the first admin
+
+There are no default accounts. After setting up your `.env`, run:
+
 ```
-
-### macOS or Linux
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-Create a `.env` file in the repository root and set a secret key. Generate a suitable value with:
-
-```bash
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-```
-
-Sample `.env`:
-
-```dotenv
-SECRET_KEY=replace_with_a_generated_secret_at_least_32_characters_long
-# DATABASE_URL="Database_URL_Here"
-# ALGORITHM=""
-# ACCESS_TOKEN_EXPIRE_MINUTES=""
-```
-
-Start the application:
-
-```bash
-python -m uvicorn main:app --reload
-```
-
-Open:
-
-- App: <http://127.0.0.1:8000/>
-- Documentation: <http://127.0.0.1:8000/docs>
-- API status: <http://127.0.0.1:8000/api-status>
-
-On first startup, the application creates the database tables. With no database URL configured, it uses the local SQLite file `eventsphere.db`.
-
-## Environment variables
-
-| Variable | Required | Description |
-| --- | --- | --- |
-| `SECRET_KEY` | Yes | Secret used to sign authentication tokens. Must be at least 32 characters. |
-| `SQLALCHEMY_DATABASE_URL` | No | Database URL. If set, this takes precedence over `DATABASE_URL`. |
-| `DATABASE_URL` | No | Database URL used when `SQLALCHEMY_DATABASE_URL` is not set. Defaults to `sqlite:///./eventsphere.db`. |
-| `ALGORITHM` | No | Token-signing algorithm. |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | No | Token lifetime in minutes. |
-
-
-## Accounts and demo credentials
-
-The repository does not include seeded demo accounts or default passwords.
-
-To create the first local admin/organiser account, make sure your `.env` is configured and run this from the repository root:
-
-```bash
 python bootstrap_admin.py
 ```
 
-The script prompts for the account details and password; it does not print or store a default password. It only creates an admin if one does not already exist. After signing in as admin, create gate-staff accounts from the organiser interface. Attendees can register through the app.
+It asks for a username and password and creates the first admin. It only works if there is no admin yet. Then sign in as the admin and create accounts for gate staff. Attendees can sign up on their own.
 
-## Tests and verification
+## Trying it out by hand
 
-For a manual test:
+I haven't written automated tests yet, so I check it like this:
 
-1. Start the app and confirm `/api-status` responds and `/docs` loads.
-2. Create an admin with `bootstrap_admin.py`, then sign in through the app.
-3. Create a venue and a published event with a ticket category.
-4. Register an attendee, book a ticket, and confirm the booking and QR ticket appear.
-5. Confirm the available ticket count decreases after booking.
-6. Create a staff account, scan the ticket, and confirm it is marked as checked in.
+1. Start the app and make sure `/docs` loads.
+2. Create an admin and sign in.
+3. Add a venue, then a published event with a ticket category.
+4. Register as an attendee and book a ticket. The booking and QR ticket should show up.
+5. Check that the number of available tickets went down.
+6. Make a staff account, scan the ticket, and check it shows as checked in.
 
+## Project layout
+
+```
+main.py             app entry point
+routers/            API routes
+agents/             [add one line on what this folder does]
+static/             frontend files
+models.py           database tables
+schemas.py          request and response shapes
+security.py         login and token code
+database.py         database connection
+config.py           settings
+dependencies.py     shared route dependencies
+bootstrap_admin.py  script to create the first admin
+```
+
+## What I'd like to add next
+
+- Automated tests
+- Email Notifications
+- Live payment gateway rather than a simulated one
+
+## License
+
+MIT. See the `LICENSE` file.
