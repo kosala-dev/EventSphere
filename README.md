@@ -20,7 +20,8 @@ Please don't delete the demo events. The data may get reset from time to time.
 
 ## Screenshots
 
-img src="https://drive.google.com/file/d/1SA8JRRpKR2YWWjZ_n9UZx_vjKL7YhTKX/view?usp=drive_link"
+<img width="1888" height="904" alt="home" src="https://github.com/user-attachments/assets/878fe165-fecc-4d52-952f-e6be8ccb37c9" />
+
 
 ## What it does
 
